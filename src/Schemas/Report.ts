@@ -17,6 +17,11 @@ export const ReportSchema = CreateReportSchema.extend({
 });
 
 export type ReportInterface = z.infer<typeof ReportSchema>;
-export class ReportDto extends createZodDto(ReportSchema) {}
+export class ReportDto extends createZodDto(ReportSchema) {
+  constructor(partial: Partial<ReportDto>) {
+    super();
+    Object.assign(this, partial);
+  }
+}
 
 export type ReportType = z.infer<typeof ReportTypeEnumSchema>;

@@ -11,7 +11,7 @@ import {
   ParseEnumPipe,
 } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ReportInterface, ReportTypeEnum } from './Schemas/Report';
+import { ReportDto, ReportTypeEnum } from './Schemas/Report';
 import { CreateReportDto } from './Schemas/CreateReport';
 
 @Controller('report/:type')
@@ -19,14 +19,14 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getAllIncomeReports(@Param('type') type: string) {
+  getAllIncomeReports(@Param('type') type: string): Array<ReportDto> {
     return this.appService.getAllReports(type);
   }
   @Get(':id')
   getIncomeReportById(
     @Param('type', new ParseEnumPipe(ReportTypeEnum)) type: string,
     @Param('id', ParseUUIDPipe) id: string,
-  ): ReportInterface {
+  ): ReportDto | undefined {
     return this.appService.getIncomeReportById({ id, type });
   }
 
@@ -34,7 +34,7 @@ export class AppController {
   createReport(
     @Body() body: CreateReportDto,
     @Param('type', new ParseEnumPipe(ReportTypeEnum)) type: string,
-  ): ReportInterface {
+  ): ReportDto {
     return this.appService.createReport({ body, type });
   }
   @Put(':id')
@@ -42,7 +42,7 @@ export class AppController {
     @Body() body: CreateReportDto,
     @Param('type', new ParseEnumPipe(ReportTypeEnum)) type: string,
     @Param('id', ParseUUIDPipe) id: string,
-  ): ReportInterface | undefined {
+  ): ReportDto | undefined {
     return this.appService.updateReport({ type, id, body });
   }
 

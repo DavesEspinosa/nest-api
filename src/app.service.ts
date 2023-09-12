@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { data } from './data';
-import { ReportInterface, ReportTypeEnum } from './Schemas/Report';
+import { ReportDto, ReportInterface, ReportTypeEnum } from './Schemas/Report';
 import { v4 as uuid } from 'uuid';
 import { CreateReport } from './Schemas/CreateReport';
 
@@ -9,7 +9,9 @@ export class AppService {
   getAllReports(type: string): Array<ReportInterface> {
     const reportTypeEnum =
       type === 'income' ? ReportTypeEnum.INCOME : ReportTypeEnum.EXPENSE;
-    return data.report.filter((report) => report.type === reportTypeEnum);
+    return data.report
+      .filter((report) => report.type === reportTypeEnum)
+      .map((report) => new ReportDto(report));
   }
 
   getIncomeReportById({
@@ -18,12 +20,14 @@ export class AppService {
   }: {
     id: string;
     type: string;
-  }): ReportInterface {
+  }): ReportInterface | undefined {
     const reportTypeEnum =
       type === 'income' ? ReportTypeEnum.INCOME : ReportTypeEnum.EXPENSE;
-    return data.report
+    const selectedReport = data.report
       .filter((report) => report.type === reportTypeEnum)
       .find((report) => report.id === id) as ReportInterface;
+    if (!selectedReport) return;
+    return new ReportDto(selectedReport);
   }
   createReport({
     body,
@@ -41,7 +45,7 @@ export class AppService {
     };
 
     data.report.push(newReport);
-    return newReport;
+    return new ReportDto(newReport);
   }
 
   updateReport({
@@ -68,7 +72,7 @@ export class AppService {
       ...data.report[reportIndex],
       ...body,
     };
-    return data.report[reportIndex];
+    return new ReportDto(data.report[reportIndex]);
   }
 
   deleteReport(id: string) {
